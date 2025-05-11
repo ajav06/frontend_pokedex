@@ -15,7 +15,7 @@ Aplicación web desarrollada con **Vue 3**, **TypeScript** y **TailwindCSS** que
 
 ## 🧠 Decisiones técnicas y principios aplicados
 
-- **KISS (Keep It Simple, Stupid)**: Componentes pequeños y reutilizables (`Item`, `Input`, `Button`, `Modal`).
+- **KISS (Keep It Simple, Stupid)**: Componentes pequeños y reutilizables (`Input`, `Button`, `Modal`).
 - **DRY (Don't Repeat Yourself)**: Composición de lógica con `usePokemon.ts`, constantes reutilizadas desde `helpers/const.ts`.
 - **SOLID**:
   - _Single Responsibility_: cada archivo tiene una responsabilidad clara (API, vista, store, etc.).
