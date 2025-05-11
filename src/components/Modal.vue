@@ -18,7 +18,7 @@ const emit = defineEmits<{
       class="fixed right-1/2 bottom-1/2 z-50 max-h-full w-full max-w-[35.75rem] translate-x-1/2 translate-y-1/2"
     >
       <div class="relative mx-8 rounded-md bg-white shadow md:mx-0">
-        <button class="absolute top-4 right-4 rounded-full" @click="emit('close')">
+        <button class="absolute top-4 right-4 rounded-full hover:opacity-70" @click="emit('close')">
           <img src="@/assets/icons/close.svg" alt="Close" class="size-7" />
         </button>
 

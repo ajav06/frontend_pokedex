@@ -49,7 +49,7 @@ onMounted(() => {
     class="disabled:bg-grey-200 flex items-center justify-center gap-2 rounded-full text-lg font-bold text-white disabled:cursor-not-allowed"
     :class="{
       'cursor-not-allowed opacity-30': props.loading,
-      '!size-11 w-auto bg-neutral-100 p-2': props.onlyIcon,
+      'hover:bg-grey-200 !size-11 w-auto bg-neutral-100 p-2': props.onlyIcon,
       'bg-primary hover:bg-secondary px-5 py-3': !props.onlyIcon,
     }"
     :disabled="props.disabled || props.loading"
