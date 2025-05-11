@@ -1,39 +1,62 @@
-# frontend_pokemon
+# 🧪 Frontend Pokédex
 
-This template should help get you started developing with Vue 3 in Vite.
+Aplicación web desarrollada con **Vue 3**, **TypeScript** y **TailwindCSS** que permite consultar, buscar y explorar Pokémon desde una API pública. La aplicación cuenta con un buscador en tiempo real, una vista de favoritos persistente y modales para detalles de cada Pokémon.
 
-## Recommended IDE Setup
+## 🚀 Tecnologías utilizadas
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+- [Vue 3 + Composition API](https://vuejs.org/) - Framework progresivo para interfaces.
+- [TypeScript](https://www.typescriptlang.org/) - Tipado estático para mayor seguridad y mantenibilidad.
+- [Pinia](https://pinia.vuejs.org/) - Manejo de estado simple y efectivo.
+- [Vue Router](https://router.vuejs.org/) - Navegación entre vistas.
+- [TailwindCSS](https://tailwindcss.com/) - Utilidades CSS para estilos consistentes y modernos.
+- [Axios](https://axios-http.com/) - Cliente HTTP para consumir APIs.
+- [Vite](https://vitejs.dev/) - Herramienta moderna de construcción para Vue.
+- [ESLint + Prettier](https://eslint.org/) - Linting y formateo automático del código.
 
-## Type Support for `.vue` Imports in TS
+## 🧠 Decisiones técnicas y principios aplicados
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+- **KISS (Keep It Simple, Stupid)**: Componentes pequeños y reutilizables (`Item`, `Input`, `Button`, `Modal`).
+- **DRY (Don't Repeat Yourself)**: Composición de lógica con `usePokemon.ts`, constantes reutilizadas desde `helpers/const.ts`.
+- **SOLID**:
+  - _Single Responsibility_: cada archivo tiene una responsabilidad clara (API, vista, store, etc.).
+  - _Open/Closed_: se pueden extender componentes o lógica sin modificar los existentes.
+- **Escalabilidad**: arquitectura basada en carpetas modulares como `api/`, `composable/`, `models/`, `components/`, etc.
+- **Separación de responsabilidades**: lógica de negocio en `composable` y `store`, vistas limpias.
 
-## Customize configuration
+## 📁 Estructura del proyecto
 
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
-pnpm install
+```
+src/
+├── api/                # Módulos para llamadas HTTP
+├── assets/             # Imágenes, íconos y estilos
+├── components/         # Componentes reutilizables (UI)
+├── composable/         # Hooks personalizados (usePokemon)
+├── helpers/            # Constantes y funciones auxiliares
+├── models/             # Tipos y modelos de datos
+├── router/             # Definición de rutas
+├── stores/             # Pinia store
+├── views/              # Vistas principales (Home, Pokédex)
+└── App.vue             # Entrada principal de la app
 ```
 
-### Compile and Hot-Reload for Development
+## ⚙️ Scripts disponibles
 
-```sh
-pnpm dev
-```
+```bash
+# Iniciar la app en modo desarrollo
+npm run dev
 
-### Type-Check, Compile and Minify for Production
+# Compilar para producción
+npm run build
 
-```sh
-pnpm build
-```
+# Previsualizar build
+npm run preview
 
-### Lint with [ESLint](https://eslint.org/)
+# Lint con fix automático
+npm run lint
 
-```sh
-pnpm lint
+# Formatear código con Prettier
+npm run format
+
+# Chequeo de tipos TypeScript
+npm run type-check
 ```
