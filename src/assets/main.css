@@ -1,0 +1,32 @@
+@import 'tailwindcss';
+
+body {
+  @apply bg-neutral text-grey-100 mx-auto;
+  font-family: 'Lato', sans-serif;
+}
+
+#app {
+  @apply mx-auto max-w-6xl;
+}
+
+@theme {
+  --color-primary: #f22539;
+  --color-secondary: #c00e20;
+  --color-tertiary: #eca539;
+  --color-neutral: #f9f9f9;
+  --color-neutral-100: #f5f5f5;
+  --color-neutral-200: #e8e8e8;
+  --color-grey: #353535;
+  --color-grey-100: #5e5e5e;
+  --color-grey-200: #bfbfbf;
+}
+
+.spinner {
+  @apply border-primary border-t-primary size-4 animate-spin rounded-full border-2 border-solid opacity-30;
+
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
