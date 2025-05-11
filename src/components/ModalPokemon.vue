@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { Pokemon } from '@/models/Pokemon';
+import { computed, type ComputedRef } from 'vue';
 import useMainStore from '@/stores';
+import type { Pokemon } from '@/models/Pokemon';
+import { BASE_URL } from '@/helpers/const';
 import Button from './Button.vue';
 import Modal from './Modal.vue';
-import { computed, type ComputedRef } from 'vue';
-import { BASE_URL } from '@/helpers/const';
 
 interface Props {
   isOpen: boolean;
@@ -34,23 +34,28 @@ const emit = defineEmits<{
   (e: 'close'): void;
 }>();
 
-/*
- * Function to share the Pokemon details using the Web Share API.
- * This function checks if the Web Share API is supported in the browser.
- * If supported, it shares the Pokemon name and URL.
- * If not supported, it logs a message to the console.
+/**
+ * Function to copy the Pokemon details to the clipboard.
+ * This function checks if the Pokemon prop is not null.
+ * If not null, it constructs a string with the Pokemon details and copies it to the clipboard.
+ * If successful, it logs a success message to the console.
+ * If an error occurs, it logs the error message to the console.
  */
-const sharePokemon = () => {
-  if (navigator.share) {
-    navigator
-      .share({
-        title: `Check out this Pokémon: ${props.pokemon?.name}`,
-        text: `I found this Pokémon: ${props.pokemon?.name}`,
-        url: `${BASE_URL}pokemon/${props.pokemon?.id}/`,
-      })
-      .catch((error) => console.error('Error sharing:', error));
-  } else {
-    console.log('Share not supported');
+const copyClipboard = () => {
+  if (props.pokemon) {
+    let textToCopy = `Check out this Pokémon:`;
+    fields.value.forEach((field) => {
+      textToCopy += `\n${field.name}: ${field.value}, `;
+    });
+    textToCopy = textToCopy.replace(/,\s*$/, '');
+    navigator.clipboard.writeText(textToCopy).then(
+      () => {
+        alert('Pokemon details copied to clipboard!');
+      },
+      (err) => {
+        console.error('Error copying text: ', err);
+      },
+    );
   }
 };
 </script>
@@ -79,7 +84,7 @@ const sharePokemon = () => {
         </div>
 
         <div class="mt-5 flex items-center justify-between">
-          <Button button-type="button" @click="sharePokemon()"> Share to my friends </Button>
+          <Button button-type="button" @click="copyClipboard()"> Share to my friends </Button>
           <Button
             button-type="button"
             @click="mainStore.updatePokemonFavorites(props.pokemon!)"
