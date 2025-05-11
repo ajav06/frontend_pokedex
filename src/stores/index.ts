@@ -4,7 +4,11 @@ import type { Pokemon } from '@/models/Pokemon';
 
 const useMainStore = defineStore('main', () => {
   const loading: Ref<boolean> = ref(false);
-  const pokemonFavorites: Ref<Pokemon[]> = ref([]);
+  const pokemonFavorites: Ref<Pokemon[]> = ref(
+    window.localStorage.getItem('pokemonFavorites')
+      ? JSON.parse(window.localStorage.getItem('pokemonFavorites') as string)
+      : [],
+  );
 
   const isLoading = computed(() => loading.value);
 
@@ -27,6 +31,7 @@ const useMainStore = defineStore('main', () => {
     } else {
       pokemonFavorites.value.splice(index, 1);
     }
+    window.localStorage.setItem('pokemonFavorites', JSON.stringify(pokemonFavorites.value));
   };
 
   /**
