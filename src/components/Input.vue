@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, type Ref } from 'vue';
+import { ref, type Ref, type InputHTMLAttributes } from 'vue';
 
 interface Props {
   modelValue: string;
   placeholder?: string;
-  type?: string;
+  type?: InputHTMLAttributes['type'];
 }
 
 const props = defineProps<Props>();
@@ -26,12 +26,13 @@ defineExpose({
 
 <template>
   <input
-    class="search placeholder:text-grey-200 text-grey rounded-lg bg-white p-3.5 font-medium shadow-[0_2px_10px_0_rgba(0,0,0,0.04)] outline-none"
     :value="props.modelValue"
     :placeholder="props.placeholder"
     :type="props.type || 'text'"
     @input="handleInput"
     ref="inputRef"
+    class="placeholder:text-grey-200 text-grey rounded-lg bg-white p-3.5 font-medium shadow-[0_2px_10px_0_rgba(0,0,0,0.04)] outline-none"
+    :class="{ search: props.type === 'search' }"
   />
 </template>
 

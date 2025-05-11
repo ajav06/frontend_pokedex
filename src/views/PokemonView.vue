@@ -161,7 +161,7 @@ onBeforeUnmount(() => {
       <section class="bg-neutral sticky top-0 py-9">
         <Input
           v-model="pokemonName"
-          type="text"
+          type="search"
           class="w-full"
           placeholder="Search"
           @keyup.enter="fetchPokemons"
