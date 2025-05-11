@@ -1,4 +1,4 @@
-import httpClient from '@/api/httpClient';
+import { findPokemon } from '@/api/pokemonAPI';
 import type { Pokemon } from '@/models/Pokemon';
 import useMainStore from '@/stores';
 import type { AxiosError } from 'axios';
@@ -15,8 +15,7 @@ const usePokemon = () => {
     try {
       mainStore.setLoading(true);
       const name = url.split('pokemon/')[1];
-      const response = await httpClient.get<Pokemon>(`pokemon/${name}`);
-      return response.data;
+      return await findPokemon(name);
     } catch (error) {
       throw error;
     } finally {

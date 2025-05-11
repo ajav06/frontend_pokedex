@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
-import httpClient from '@/api/httpClient';
 import useMainStore from '@/stores';
 import Input from '@/components/Input.vue';
 import Footer from '@/components/Footer.vue';
 import Button from '@/components/Button.vue';
-import type { Pokemon, PokemonItem, PokemonResponse, PokemonView } from '@/models/Pokemon';
+import type { Pokemon, PokemonItem, PokemonView } from '@/models/Pokemon';
 import Item from '@/components/Item.vue';
 import Modal from '@/components/ModalPokemon.vue';
 import usePokemon from '@/composable/usePokemon';
 import { BASE_URL, FETCH_LIMIT } from '@/helpers/const';
+import { findPokemons } from '@/api/pokemonAPI';
 
 const mainStore = useMainStore();
 const { getPokemon } = usePokemon();
@@ -25,7 +25,7 @@ const isFetching: Ref<boolean> = ref(false);
 const hasMore: Ref<boolean> = ref(true);
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
-/*
+/**
  * Function to fetch Pokemon data from the API.
  * This function checks if the user is searching for a specific Pokemon or if the view is set to 'favorites'.
  * If the view is 'favorites', it fetches the favorite Pokemon from the store.
@@ -37,16 +37,11 @@ const fetchPokemons = async () => {
   isFetching.value = true;
   try {
     mainStore.setLoading(true);
-    const response = await httpClient.get<PokemonResponse | Pokemon>(
-      `pokemon/${pokemonName.value.toLowerCase().trim()}`,
-      {
-        params: {
-          limit: FETCH_LIMIT,
-          offset: offset.value,
-        },
-      },
+    const data = await findPokemons(
+      pokemonName.value.toLowerCase().trim(),
+      offset.value,
+      FETCH_LIMIT,
     );
-    const data = response.data;
 
     if (('results' in data && data.results.length < FETCH_LIMIT) || !('results' in data)) {
       hasMore.value = false;
@@ -73,7 +68,7 @@ const fetchPokemons = async () => {
   }
 };
 
-/*
+/**
  * Function to open the modal with the Pokemon details.
  * @param {PokemonItem | Pokemon} pokemonItem - The Pokemon item or Pokemon object to display in the modal.
  */
@@ -92,7 +87,7 @@ const openModal = async (pokemonItem: PokemonItem | Pokemon) => {
   visibleModal.value = !!pokemon.value;
 };
 
-/*
+/**
  * Function to close the modal and reset the Pokemon data.
  */
 const closeModal = () => {
@@ -100,7 +95,7 @@ const closeModal = () => {
   pokemon.value = null;
 };
 
-/*
+/**
  * Function to change the view of the Pokemon list.
  * @param {PokemonView} view - The view to switch to ('all' or 'favorites').
  */
@@ -124,7 +119,7 @@ const changeView = async (view: PokemonView) => {
   }
 };
 
-/*
+/**
  * Function to handle the scroll event and fetch more Pokemon when the user scrolls to the bottom of the page.
  * This function checks the scroll position and triggers the fetchPokemons function if the user is near the bottom of the page.
  */
