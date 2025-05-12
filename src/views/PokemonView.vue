@@ -47,7 +47,16 @@ const {
  * Function to open the modal and set the Pokemon data.
  * @param {PokemonItem | Pokemon} pokemonItem - The Pokemon item to display in the modal.
  */
-const openModal = (pokemonItem: PokemonItem | Pokemon) => {
+const openModal = async (pokemonItem: PokemonItem | Pokemon) => {
+  mainStore.setLoading(true);
+
+  await new Promise((resolve) => {
+    setTimeout(() => {
+      mainStore.setLoading(false);
+      resolve(true);
+    }, 1000);
+  });
+
   if ('abilities' in pokemonItem) {
     pokemon.value = pokemonItem;
     visibleModal.value = true;

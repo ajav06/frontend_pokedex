@@ -48,7 +48,9 @@ watch(isFetching, (newValue) => {
 </script>
 
 <template>
-  <div class="flex w-full items-center justify-between rounded-lg bg-white py-2 pr-2.5 pl-5">
+  <div
+    class="flex w-full items-center justify-between rounded-lg bg-white py-2 pr-2.5 pl-5 hover:cursor-pointer"
+  >
     <p class="text-grey text-2xl font-medium capitalize">
       {{ props.pokemon.name }}
     </p>
