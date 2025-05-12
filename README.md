@@ -24,7 +24,6 @@ Este proyecto forma parte de una prueba técnica y está enfocado en demostrar b
   - _Single Responsibility_: cada archivo tiene una responsabilidad clara (API, vista, store, etc.).
   - _Open/Closed_: se pueden extender componentes o lógica sin modificar los existentes.
 - **Escalabilidad**: arquitectura basada en carpetas modulares como `api/`, `queries/`, `models/`, `components/`, etc.
-- **Separación de responsabilidades**: lógica de negocio en `composable` y `store`, vistas limpias.
 - **Consultas reactivas y cacheo automático**: uso de @tanstack/vue-query para manejar datos remotos con eficiencia y actualización reactiva.
 - **Scroll infinito y manejo de estados separados**: implementación de scroll infinito para carga progresiva de Pokémon, separación clara de estados como `pokemonName` y `modalPokemonName` para un manejo óptimo de la UI.
 
