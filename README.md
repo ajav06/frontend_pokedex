@@ -1,5 +1,7 @@
 # 🧪 Frontend Pokédex
 
+🌐 **Demo en vivo**: [favorite-pokemons.netlify.app](https://favorite-pokemons.netlify.app/)
+
 Aplicación web desarrollada con **Vue 3**, **TypeScript**, **TailwindCSS** y **@tanstack/vue-query** que permite consultar, buscar y explorar Pokémon desde una API pública. La aplicación cuenta con un buscador en tiempo real, una vista de favoritos persistente y modales para detalles de cada Pokémon.
 
 Este proyecto forma parte de una prueba técnica y está enfocado en demostrar buenas prácticas de arquitectura, manejo de datos y UI escalable con Vue 3.
@@ -15,6 +17,10 @@ Este proyecto forma parte de una prueba técnica y está enfocado en demostrar b
 - [@tanstack/vue-query](https://tanstack.com/query/latest/docs/framework/vue/overview) - Manejo avanzado de consultas con cacheo automático y reactividad.
 - [Vite](https://vitejs.dev/) - Herramienta moderna de construcción para Vue.
 - [ESLint + Prettier](https://eslint.org/) - Linting y formateo automático del código.
+
+## ☁️ Despliegue
+
+Esta aplicación fue desplegada en [Netlify](https://www.netlify.com/), permitiendo actualizaciones automáticas con cada push a la rama principal.
 
 ## 🧠 Decisiones técnicas y principios aplicados
 

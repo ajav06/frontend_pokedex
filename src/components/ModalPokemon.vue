@@ -80,7 +80,7 @@ const copyClipboard = () => {
           :key="field.name"
         >
           <h3 class="font-bold">{{ field.name }}:</h3>
-          <p class="ml-1 font-medium">{{ field.value }}</p>
+          <p class="ml-1 font-medium capitalize">{{ field.value }}</p>
         </div>
 
         <div class="mt-5 flex items-center justify-between">
