@@ -1,31 +1,32 @@
 <script setup lang="ts">
+import { computed, ref, watch, type ComputedRef, type Ref } from 'vue';
 import type { Pokemon, PokemonItem } from '@/models/Pokemon';
-import Button from './Button.vue';
-import usePokemon from '@/composable/usePokemon';
 import useMainStore from '@/stores';
-import { computed, type ComputedRef } from 'vue';
+import { usePokemonQuery } from '@/queries/pokemon';
+import Button from './Button.vue';
 
 const props = defineProps<{
   pokemon: PokemonItem | Pokemon;
 }>();
 
 const mainStore = useMainStore();
-const { getPokemon } = usePokemon();
-
-const pokemonId: ComputedRef<number> = computed(() =>
+const isEnabled: Ref<boolean> = ref(false);
+const pokemonId: ComputedRef<string> = computed(() =>
   'abilities' in props.pokemon
-    ? props.pokemon.id
-    : Number(props.pokemon.url.split('pokemon/')[1].split('/')[0]),
+    ? String(props.pokemon.id)
+    : props.pokemon.url.split('pokemon/')[1].split('/')[0],
 );
+
+const { data, isFetching, refetch } = usePokemonQuery(pokemonId, isEnabled);
 
 const isPokemonFavorite: ComputedRef<boolean> = computed(() =>
-  mainStore.isPokemonFavorite(pokemonId.value),
+  mainStore.isPokemonFavorite(Number(pokemonId.value)),
 );
 
-/*
- * Function to add a Pokemon to the favorites list.
- * It checks if the Pokemon is already in the favorites list.
- * If not, it fetches the Pokemon details from the API and adds it to the favorites list.
+/**
+ * Function to add or remove a Pokemon from favorites.
+ * If the Pokemon is already a favorite, it will be removed.
+ * If the Pokemon is not a favorite, it will be added.
  */
 const addFavorites = async () => {
   let pokemon: Pokemon | null = null;
@@ -33,18 +34,17 @@ const addFavorites = async () => {
   if ('abilities' in props.pokemon) {
     pokemon = props.pokemon;
   } else {
-    const result = await getPokemon(props.pokemon.url);
-    if (result && !(result instanceof Error)) {
-      pokemon = result;
-    } else {
-      console.error('Error fetching Pokemon details:', result);
-      pokemon = null;
-      return;
-    }
+    isEnabled.value = true;
+    if (!data.value) await refetch();
+    pokemon = data.value!;
   }
 
   mainStore.updatePokemonFavorites(pokemon!);
 };
+
+watch(isFetching, (newValue) => {
+  mainStore.setLoading(newValue);
+});
 </script>
 
 <template>

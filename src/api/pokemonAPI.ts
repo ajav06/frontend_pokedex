@@ -13,17 +13,12 @@ export const findPokemon = async (name: string): Promise<Pokemon> => {
 
 /**
  * Fetches a list of Pokemon or a Pokemon from the PokeAPI.
- * @param {string} name - The name of the Pokemon to fetch.
  * @param {number} offset - The offset for pagination.
  * @param {number} limit - The limit for pagination.
- * @returns {Promise<PokemonResponse | Pokemon>} - A promise that resolves to the Pokemon data or a list of Pokemon.
+ * @returns {Promise<PokemonResponse>} - A promise that resolves to the Pokemon data.
  */
-export const findPokemons = async (
-  name: string,
-  offset: number,
-  limit: number,
-): Promise<PokemonResponse | Pokemon> => {
-  const response = await httpClient.get<PokemonResponse | Pokemon>(`pokemon/${name}`, {
+export const findPokemons = async (offset: number, limit: number): Promise<PokemonResponse> => {
+  const response = await httpClient.get<PokemonResponse>('pokemon', {
     params: {
       limit,
       offset,

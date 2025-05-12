@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref, watch, type Ref } from 'vue';
 import useMainStore from '@/stores';
 import Input from '@/components/Input.vue';
 import Footer from '@/components/Footer.vue';
@@ -7,84 +7,55 @@ import Button from '@/components/Button.vue';
 import type { Pokemon, PokemonItem, PokemonView } from '@/models/Pokemon';
 import Item from '@/components/Item.vue';
 import Modal from '@/components/ModalPokemon.vue';
-import usePokemon from '@/composable/usePokemon';
 import { BASE_URL, FETCH_LIMIT } from '@/helpers/const';
-import { findPokemons } from '@/api/pokemonAPI';
+import { useInfinitePokemonsQuery, usePokemonQuery } from '@/queries/pokemon';
 
 const mainStore = useMainStore();
-const { getPokemon } = usePokemon();
 
 const pokemonName: Ref<string> = ref('');
+const modalPokemonName: Ref<string> = ref('');
 const pokemonList: Ref<PokemonItem[]> = ref([]);
 const pokemon: Ref<Pokemon | null> = ref(null);
-const inputElement: Ref<InstanceType<typeof Input> | null> = ref(null);
 const visibleModal: Ref<boolean> = ref(false);
 const viewSelected: Ref<PokemonView> = ref('all');
-const offset: Ref<number> = ref(0);
-const isFetching: Ref<boolean> = ref(false);
-const hasMore: Ref<boolean> = ref(true);
+const inputElement: Ref<InstanceType<typeof Input> | null> = ref(null);
 let debounceTimeout: ReturnType<typeof setTimeout> | null = null;
 
-/**
- * Function to fetch Pokemon data from the API.
- * This function checks if the user is searching for a specific Pokemon or if the view is set to 'favorites'.
- * If the view is 'favorites', it fetches the favorite Pokemon from the store.
- * Otherwise, it fetches the Pokemon list from the API based on the search input.
- */
-const fetchPokemons = async () => {
-  if (isFetching.value || !hasMore.value || viewSelected.value === 'favorites') return;
+const isSearchEnabled = computed(
+  () => pokemonName.value.trim() !== '' && viewSelected.value === 'all',
+);
+const isModalEnabled = computed(() => modalPokemonName.value.trim() !== '');
 
-  isFetching.value = true;
-  try {
-    mainStore.setLoading(true);
-    const data = await findPokemons(
-      pokemonName.value.toLowerCase().trim(),
-      offset.value,
-      FETCH_LIMIT,
-    );
-
-    if (('results' in data && data.results.length < FETCH_LIMIT) || !('results' in data)) {
-      hasMore.value = false;
-    }
-
-    if ('results' in data) {
-      pokemonList.value.push(...(data.results as PokemonItem[]));
-      offset.value += FETCH_LIMIT;
-    } else {
-      pokemonList.value = [
-        {
-          name: data.name,
-          url: `${BASE_URL}pokemon/${data.id}/`,
-        },
-      ];
-    }
-  } catch (error) {
-    pokemonList.value = [];
-    console.error(error);
-  } finally {
-    isFetching.value = false;
-    mainStore.setLoading(false);
-    inputElement.value?.focus();
-  }
-};
+const {
+  data: fetchedPokemonPages,
+  fetchNextPage,
+  isFetching: isFetchingList,
+  refetch: refetchList,
+} = useInfinitePokemonsQuery(FETCH_LIMIT);
+const {
+  data: fetchedPokemon,
+  refetch: refetchPokemon,
+  isFetching: isFetchingPokemon,
+} = usePokemonQuery(pokemonName, isSearchEnabled);
+const {
+  data: modalFetchedPokemon,
+  isFetching: isFetchingModalPokemon,
+  refetch: refetchModalPokemon,
+} = usePokemonQuery(modalPokemonName, isModalEnabled);
 
 /**
- * Function to open the modal with the Pokemon details.
- * @param {PokemonItem | Pokemon} pokemonItem - The Pokemon item or Pokemon object to display in the modal.
+ * Function to open the modal and set the Pokemon data.
+ * @param {PokemonItem | Pokemon} pokemonItem - The Pokemon item to display in the modal.
  */
-const openModal = async (pokemonItem: PokemonItem | Pokemon) => {
+const openModal = (pokemonItem: PokemonItem | Pokemon) => {
   if ('abilities' in pokemonItem) {
     pokemon.value = pokemonItem;
+    visibleModal.value = true;
   } else {
-    const result = await getPokemon(pokemonItem.url);
-    if (result && !(result instanceof Error)) {
-      pokemon.value = result;
-    } else {
-      console.error('Error fetching Pokemon details:', result);
-      pokemon.value = null;
-    }
+    const name = pokemonItem.url.split('pokemon/')[1].replace('/', '');
+    modalPokemonName.value = name;
+    refetchModalPokemon();
   }
-  visibleModal.value = !!pokemon.value;
 };
 
 /**
@@ -93,6 +64,7 @@ const openModal = async (pokemonItem: PokemonItem | Pokemon) => {
 const closeModal = () => {
   visibleModal.value = false;
   pokemon.value = null;
+  modalPokemonName.value = '';
 };
 
 /**
@@ -101,10 +73,14 @@ const closeModal = () => {
  */
 const changeView = async (view: PokemonView) => {
   viewSelected.value = view;
+
+  if (pokemonName.value) {
+    handleInputSearch();
+    return;
+  }
+
   if (view === 'favorites') {
     pokemonList.value = [];
-    offset.value = 0;
-    hasMore.value = true;
 
     pokemonList.value = mainStore
       .getPokemonFavorites()
@@ -113,10 +89,11 @@ const changeView = async (view: PokemonView) => {
         url: `pokemon/${item.id}/`,
       }))
       .filter((item) => item.name.toLowerCase().includes(pokemonName.value.toLowerCase().trim()));
-  } else {
-    pokemonList.value = [];
-    await fetchPokemons();
+    return;
   }
+  pokemonList.value = [];
+  refetchList();
+  pokemonList.value = fetchedPokemonPages.value?.pages.flatMap((page) => page.results) || [];
 };
 
 /**
@@ -129,23 +106,76 @@ const handleScroll = () => {
   const fullHeight = document.body.scrollHeight;
 
   if (scrollTop + windowHeight >= fullHeight - 300) {
-    fetchPokemons();
+    fetchNextPage();
   }
+};
+
+/**
+ * Function to handle the input search and filter the Pokemon list based on the search term.
+ * This function is called when the user types in the search input.
+ */
+const handleInputSearch = () => {
+  pokemonList.value = [];
+
+  if (!pokemonName.value) {
+    changeView(viewSelected.value);
+    return;
+  }
+
+  if (viewSelected.value === 'favorites') {
+    pokemonList.value = mainStore
+      .getPokemonFavorites()
+      .map((item) => ({
+        name: item.name,
+        url: `pokemon/${item.id}/`,
+      }))
+      .filter((item) => item.name.toLowerCase().includes(pokemonName.value.toLowerCase().trim()));
+    return;
+  }
+
+  refetchPokemon();
 };
 
 watch(pokemonName, () => {
   if (debounceTimeout) clearTimeout(debounceTimeout);
   debounceTimeout = setTimeout(() => {
     pokemonList.value = [];
-    offset.value = 0;
-    hasMore.value = true;
-    changeView(viewSelected.value);
+    handleInputSearch();
   }, 700);
+});
+
+watch(isFetchingList, (newValue) => {
+  mainStore.setLoading(newValue);
+  if (!newValue && viewSelected.value === 'all')
+    pokemonList.value = fetchedPokemonPages.value?.pages.flatMap((page) => page.results) || [];
+});
+
+watch(isFetchingPokemon, (newValue) => {
+  mainStore.setLoading(newValue);
+
+  if (!newValue && isSearchEnabled.value) {
+    pokemonList.value = fetchedPokemon.value
+      ? [
+          {
+            name: fetchedPokemon.value.name,
+            url: `${BASE_URL}/pokemon/${fetchedPokemon.value.id}/`,
+          },
+        ]
+      : [];
+  }
+});
+
+watch(isFetchingModalPokemon, (newValue) => {
+  mainStore.setLoading(newValue);
+  if (!newValue && modalFetchedPokemon.value && isModalEnabled.value) {
+    pokemon.value = modalFetchedPokemon.value;
+    visibleModal.value = true;
+  }
 });
 
 onMounted(() => {
   window.addEventListener('scroll', handleScroll);
-  fetchPokemons();
+  changeView(viewSelected.value);
 });
 
 onBeforeUnmount(() => {
@@ -164,7 +194,6 @@ onBeforeUnmount(() => {
           type="search"
           class="w-full"
           placeholder="Search"
-          @keyup.enter="fetchPokemons"
           ref="inputElement"
         />
       </section>
