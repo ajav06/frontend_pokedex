@@ -12,7 +12,7 @@ Este proyecto forma parte de una prueba técnica y está enfocado en demostrar b
 - [Vue Router](https://router.vuejs.org/) - Navegación entre vistas.
 - [TailwindCSS](https://tailwindcss.com/) - Utilidades CSS para estilos consistentes y modernos.
 - [Axios](https://axios-http.com/) - Cliente HTTP para consumir APIs.
-- [@tanstack/vue-query](https://tanstack.com/query/v4/docs/vue/overview) - Manejo avanzado de consultas con cacheo automático y reactividad.
+- [@tanstack/vue-query](https://tanstack.com/query/latest/docs/framework/vue/overview) - Manejo avanzado de consultas con cacheo automático y reactividad.
 - [Vite](https://vitejs.dev/) - Herramienta moderna de construcción para Vue.
 - [ESLint + Prettier](https://eslint.org/) - Linting y formateo automático del código.
 
