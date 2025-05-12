@@ -32,6 +32,7 @@ export const useInfinitePokemonsQuery = (limit: number = 20) =>
  * If the Pokémon doesn't exist or there's an error, it returns `null` instead of throwing.
  *
  * @param {Ref<string>} name - The name of the Pokémon to fetch (reactive).
+ * @param {Ref<boolean>} [enabled=ref(true)] - A reactive flag to enable or disable the query.
  * @returns {UseQueryReturnType<Pokemon | null, Error>} - The result of the query, including status and data.
  */
 export const usePokemonQuery = (name: Ref<string>, enabled: Ref<boolean> = ref(true)) =>
